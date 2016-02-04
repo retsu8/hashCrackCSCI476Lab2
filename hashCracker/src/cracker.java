@@ -15,16 +15,21 @@ public class cracker
         Hashtable<String, String> crackedHash[] = new Hashtable[md5list.toString().length()];
         while (md5list.readLine() != null) {
             //still needs a timer and to be checked.
+            long oldTime = getSec();
             byte[] currentHash = md5list.readLine().getBytes();
             while (dictionary.readLine() != null) {
                 String dictionaryPass = dictionary.readLine();
                 if(md.digest(dictionaryPass.getBytes()) == currentHash);
                     crackedHash.put(md5list.readLine(), dictionary.readLine());
             }
+            long newtime = getSec();
             i++;
         }
         while(md5list.readLine() != null) {
             System.out.println("The password for hash value " + md5list.readLine() +" is "+ crackedHash.get(md5list.readLine()) +", it takes the program 0.012 sec to recover this password");
         }
+    }
+    static long getSec() {
+        return System.currentTimeMillis() / 1000;
     }
 }
