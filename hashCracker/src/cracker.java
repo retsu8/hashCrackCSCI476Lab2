@@ -14,6 +14,7 @@ public class cracker
         int i = 0;
         Hashtable<String, String> crackedHash[] = new Hashtable[md5list.toString().length()];
         while (md5list.readLine() != null) {
+            //still needs a timer and to be checked.
             byte[] currentHash = md5list.readLine().getBytes();
             while (dictionary.readLine() != null) {
                 String dictionaryPass = dictionary.readLine();
