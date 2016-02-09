@@ -1,10 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import sys, re, hashlib, os, getopt
+import sys, re, hashlib, os, getopt, datetime
 # Check hash length
 def chklength(hashes):
-    print hashes
-    print len(hashes)
     if len(hashes) != 32:
         sys.exit(1)
 
@@ -17,18 +15,20 @@ def dict_attack(md5table, dictionary):
         print("Check your wordlist path.")
         sys.exit(-1)
     print "Cracking the md5 hashes"
+    start = datetime.datetime.now()
 
-    with open(md5table) as hashlist:
-        with open(dictionary) as wordlist:
-            for hash_2_crack in hashlist:
-                hash_2_crack.strip()
-                chklength(hash_2_crack.strip())
-                for word in wordlist:
-                    print word.strip()
+    with open(dictionary, 'r', 1) as wordlist:
+        with open(md5table, 'r') as hashlist:
+            for word in wordlist:
+                for hash_2_crack in hashlist:
+                    chklength(hash_2_crack.strip())
+                    hash_2_crack.strip()
                     word.strip()
+                    print word
                     if hashlib.md5(word).hexdigest() == hash_2_crack:
-                        print "MD5 : %s , Password: %s" % (hash_2_crack, word)
-                print "Failed to crack file."
+                        finish = datetime.datetime.now()
+                        print "MD5: ", hash_2_crack ,", Password: ", word ,", Time: ", finish -start
+            print "Finished"
 
 def main(argv):
     md5table = ""
