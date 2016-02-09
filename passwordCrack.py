@@ -2,9 +2,11 @@
 # -*- coding: utf-8 -*-
 import sys, re, hashlib, os, getopt, datetime
 # Check hash length
-def chklength(hashes):
-    if len(hashes) != 32:
-        sys.exit(1)
+def chklength(crackedMD5):
+    for hashes in crackedMD5:
+        hashes.strip()
+        if len(hashes) != 32:
+            sys.exit(1)
 
 # Attempts to crack hash against any givin wordlist.
 def dict_attack(md5table, dictionary):
@@ -15,20 +17,25 @@ def dict_attack(md5table, dictionary):
         print("Check your wordlist path.")
         sys.exit(-1)
     print "Cracking the md5 hashes"
+    crackedMD5 = [][]
+    i = 0
+    with open(md5table, 'r') as hashlist:
+        for hashes in hashlist:
+            crackedMD5.append(hashes)
+    hashlist.close()
     start = datetime.datetime.now()
+    chklength(crackedMD5)
 
     with open(dictionary, 'r') as wordlist:
         for word in wordlist:
-            with open(md5table, 'r') as hashlist:
-                for hash_2_crack in hashlist:
-                    print "Checking: ", word.strip()
-                    chklength(hash_2_crack.strip())
-                    hash_2_crack.strip()
-                    word.strip()
-                    if hashlib.md5(word).hexdigest() == hash_2_crack:
-                        finish = datetime.datetime.now()
-                        print "MD5: ", hash_2_crack ,", Password: ", word ,", Time: ", finish -start
-            hashlist.close()
+            print "Checking: ", word.strip()
+            for hash_2_crack in crackedMD5:
+                hash_2_crack.strip()
+                word.strip()
+                if hashlib.md5(word).hexdigest() == hash_2_crack:
+                    finish = datetime.datetime.now()
+                    print "MD5: ", hash_2_crack ,", Password: ", word ,", Time: ", finish -start
+    wordlist.close()
     print "Finished"
 
 def main(argv):
