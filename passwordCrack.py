@@ -13,6 +13,7 @@ def md5Cracker(crackedMD5, dictionary, passwords):
             for hash_2_crack in crackedMD5:
                 if hashlib.md5(word.strip()).hexdigest() == hash_2_crack:
                     passwords.append(word)
+                    break
                 elif len(passwords) >= len(crackedMD5):
                     wordlist.close()
                     return passwords
