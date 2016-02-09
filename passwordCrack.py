@@ -17,18 +17,19 @@ def dict_attack(md5table, dictionary):
     print "Cracking the md5 hashes"
     start = datetime.datetime.now()
 
-    with open(dictionary, 'r', 1) as wordlist:
-        with open(md5table, 'r') as hashlist:
-            for word in wordlist:
+    with open(dictionary, 'r') as wordlist:
+        for word in wordlist:
+            with open(md5table, 'r') as hashlist:
                 for hash_2_crack in hashlist:
+                    print "Checking: ", word.strip()
                     chklength(hash_2_crack.strip())
                     hash_2_crack.strip()
                     word.strip()
-                    print word
                     if hashlib.md5(word).hexdigest() == hash_2_crack:
                         finish = datetime.datetime.now()
                         print "MD5: ", hash_2_crack ,", Password: ", word ,", Time: ", finish -start
-            print "Finished"
+            hashlist.close()
+    print "Finished"
 
 def main(argv):
     md5table = ""
