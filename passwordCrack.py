@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import sys, re, hashlib, os, getopt, datetime, multiprocessing, thread
+from numbapro import cuda
 # Check hash length
 class myThread (threading.Thread):
     def __init__(self, threadID, name, counter):
@@ -12,7 +13,7 @@ class myThread (threading.Thread):
         print "Starting " + self.name
         print_time(self.name, self.counter, 5)
         print "Exiting " + self.name
-        
+
 def chklength(crackedMD5):
     for hashes in crackedMD5:
         if len(hashes.strip()) != 32:
