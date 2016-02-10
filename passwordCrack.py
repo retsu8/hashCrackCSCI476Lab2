@@ -1,28 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import sys, re, hashlib, os, getopt, datetime, multiprocessing, thread
-from numbapro import cuda
 # Check hash length
-class myThread (threading.Thread):
-    def __init__(self, threadID, name, counter):
-        threading.Thread.__init__(self)
-        self.threadID = threadID
-        self.name = name
-        self.counter = counter
-    def run(self):
-        print "Starting " + self.name
-        print_time(self.name, self.counter, 5)
-        print "Exiting " + self.name
 
 def chklength(crackedMD5):
     for hashes in crackedMD5:
         if len(hashes.strip()) != 32:
             sys.exit(1)
-def buildingThreads():
-    try:
-        thread.start_new_thread()
-    except:
-        print "Error: unable to start thread"
+
 def md5Cracker(crackedMD5, dictionary, passwords):
     with open(dictionary, 'r') as wordlist:
         for word in wordlist:
