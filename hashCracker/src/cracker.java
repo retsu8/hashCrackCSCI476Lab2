@@ -51,8 +51,7 @@ public class Cracker
         System.out.println("Thread " +  threadName + " exiting.");
     }
 
-    public void start ()
-    {
+    public void start (){
         System.out.println("Starting " +  threadName );
         if (t == null)
         {
