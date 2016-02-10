@@ -8,7 +8,7 @@ package hashcracker;
 
 /**
  *
- * @author j42p557
+ * @author Will Ryan
  */
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -129,12 +129,14 @@ public class Cracker
 //            
 //        }
         //start(args[0]);
-        
+        long start = getSec();
         for (String p : commonPwds) {
             hash = md5hash(p);
             if (hash2unames.containsKey(hash)) {
                 String user = hash2unames.get(hash);
-                out.println("The password for hashkey " + user + " is " + p);
+                long finish = getSec();
+                long time = finish - start;
+                out.println("The password for Hashkey " + user + " is " + p + "found in " + time);
             }
         }
     }
