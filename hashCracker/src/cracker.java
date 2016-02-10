@@ -30,10 +30,15 @@ import static java.lang.System.err;
 
 public class Cracker
 {
-    private Thread t;
-    private String threadName;
-    private String hash;
-    void RunnableHash (String digest){
+    private static Thread t;
+    private static String threadName;
+    private static String hash;
+    private static String password = "";
+    private static ArrayList<String> commonPwds;
+    private static Map<String,String> hash2unames;
+    
+            
+    public static void RunnableHash (String digest){
         threadName = digest;
         System.out.print("Creating "+threadName);
     }
@@ -51,18 +56,23 @@ public class Cracker
         System.out.println("Thread " +  threadName + " exiting.");
     }
 
-    public void start (){
+    public static void start (String common)
+    {
         System.out.println("Starting " +  threadName );
         if (t == null)
         {
-            t = new Thread (threadName);
-            t.start ();
+            PasswordDict d = new PasswordDict(password);
+            //d.setCommonPwds(commonPwds);
+            d.setHash2unames(hash2unames);
+            d.setHash(hash);
+            t = new Thread(d);
+            t.start();
         }
     }
-    private static Set<String> loadPasswords(String filename)
+    private static ArrayList<String> loadPasswords(String filename)
             throws FileNotFoundException {
         Scanner scan = new Scanner(new File(filename));
-        Set<String> pwds = new HashSet<String>();
+        ArrayList<String> pwds = new ArrayList<String>();
         while (scan.hasNextLine()) {
             String line = scan.nextLine();
             pwds.add(line);
@@ -80,9 +90,8 @@ public class Cracker
         Scanner scan = new Scanner(new File(filename));
         Map<String,String> hashes = new HashMap<String,String>();
         while (scan.hasNext()) {
-            String username = scan.next();
             String hash = scan.next();
-            hashes.put(hash,username);
+            hashes.put(hash,hash);
         }
         scan.close();
         return hashes;
@@ -111,16 +120,21 @@ public class Cracker
         }
 
         out.println("Loading passwords");
-        Set<String> commonPwds = loadPasswords(args[0]);
-
+        commonPwds = loadPasswords(args[0]);
+        
         out.println("Loading hashes");
-        Map<String,String> hash2unames = loadHash2Username(args[1]);
+        hash2unames = loadHash2Username(args[1]);
 
+//        for (String p : commonPwds) {
+//            
+//        }
+        //start(args[0]);
+        
         for (String p : commonPwds) {
-            String hash = md5hash(p);
+            hash = md5hash(p);
             if (hash2unames.containsKey(hash)) {
                 String user = hash2unames.get(hash);
-                out.println("The password for " + user + " is " + p);
+                out.println("The password for hashkey " + user + " is " + p);
             }
         }
     }
