@@ -8,78 +8,60 @@ package hashcracker;
 
 /**
  *
- * @author Will Ryan
+ * @author William Paddock and Ryan Darnell
  */
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.security.MessageDigest;
-import java.util.Hashtable;
 import java.util.HashSet;
 import java.util.Set;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-
 import static java.lang.System.out;
 import static java.lang.System.err;
 
 public class Cracker
 {
-    private static Thread t;
-    private static String threadName;
-    private static String hash;
-    private static String password = "";
-    private static ArrayList<String> commonPwds;
+    private static Cores[] commonPwds;
     private static Map<String,String> hash2unames;
+    private static long timer;
     
-            
-    public static void RunnableHash (String digest){
-        threadName = digest;
-        System.out.print("Creating "+threadName);
-    }
-    public void run() {
-        System.out.println("Running " +  threadName );
-        try {
-            for(int i = 4; i > 0; i--) {
-                System.out.println("Thread: " + threadName + ", " + i);
-                // Let the thread sleep for a while.
-                Thread.sleep(50);
-            }
-        } catch (InterruptedException e) {
-            System.out.println("Thread " +  threadName + " interrupted.");
-        }
-        System.out.println("Thread " +  threadName + " exiting.");
-    }
-
-    public static void start (String common)
+    //Implement Multithreading...
+    public static void start (Cores next, int num)
     {
-        System.out.println("Starting " +  threadName );
-        if (t == null)
-        {
-            PasswordDict d = new PasswordDict(password);
-            //d.setCommonPwds(commonPwds);
+        System.out.println("Starting core " + num + "...");
+
+            PasswordDict d = new PasswordDict();
+            d.setCommonPwds(next.getList());
             d.setHash2unames(hash2unames);
-            d.setHash(hash);
-            t = new Thread(d);
+            d.setStart(timer);
+            Thread t = new Thread(d);
             t.start();
-        }
+           
     }
-    private static ArrayList<String> loadPasswords(String filename)
-            throws FileNotFoundException {
+    private static Cores[] loadPasswords(String filename) throws FileNotFoundException {
         Scanner scan = new Scanner(new File(filename));
-        ArrayList<String> pwds = new ArrayList<String>();
+        Set<String> pwds = new HashSet();
+        int cores = Runtime.getRuntime().availableProcessors() - 1; //main() thread already running
+        if (cores < 1) //for single core processors
+            cores = 1;
+        Cores[] core= new Cores[cores];
+        for (int i = 0; i < cores; i++) {
+            core[i] = new Cores();
+        }
+        int j = 0;
         while (scan.hasNextLine()) {
-            String line = scan.nextLine();
-            pwds.add(line);
+            core[j%cores].add(scan.nextLine());
+            j++;
+            //pwds.add(line);
+           
         }
         scan.close();
-        return pwds;
+        return core;
     }
+    
 
     /**
      * Reads in a whitespace-delimited file of usernames and hashes,
@@ -101,7 +83,7 @@ public class Cracker
      * Calculates out the md5 hash value of the specified String,
      * returning the hash as a 32 char hex string.
      */
-    private static String md5hash(String s) throws NoSuchAlgorithmException {
+    public static String md5hash(String s) throws NoSuchAlgorithmException {
         MessageDigest md5 = MessageDigest.getInstance("md5");
         md5.update(s.getBytes());
         byte[] md5Bytes = md5.digest();
@@ -115,6 +97,9 @@ public class Cracker
     }
 
     public static void main (String[] args) throws FileNotFoundException, NoSuchAlgorithmException {
+        
+        
+        
         if (args.length != 2) {
             err.println("Usage: java edu.sjsu.crypto.Cracker <common passwords> <hashed passwords>");
         }
@@ -125,22 +110,19 @@ public class Cracker
         out.println("Loading hashes");
         hash2unames = loadHash2Username(args[1]);
 
-//        for (String p : commonPwds) {
-//            
-//        }
-        //start(args[0]);
-        long start = getSec();
-        for (String p : commonPwds) {
-            hash = md5hash(p);
-            if (hash2unames.containsKey(hash)) {
-                String user = hash2unames.get(hash);
-                long finish = getSec();
-                long time = finish - start;
-                out.println("The password for Hashkey " + user + " is " + p + "found in " + time);
-            }
+       
+        int cores = Runtime.getRuntime().availableProcessors();
+        System.out.println("Number of cores = " + cores);
+        
+        timer = System.nanoTime(); //Start the timer to measure how long the code takes to find a match
+        //execute new threads for the unused cores
+        int num = Runtime.getRuntime().availableProcessors() - 1; 
+        if (num < 1) //for single core processors
+            num = 1;
+        for (int i = 0; i < num; i++) {
+            start(commonPwds[i], i+1);
         }
+        
     }
-    static long getSec() {
-        return System.currentTimeMillis() / 1000;
-    }
+
 }
