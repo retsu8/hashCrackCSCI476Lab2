@@ -1,3 +1,15 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package hashcracker;
+
+/**
+ *
+ * @author j42p557
+ */
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.security.MessageDigest;
@@ -16,12 +28,13 @@ import java.util.Scanner;
 import static java.lang.System.out;
 import static java.lang.System.err;
 
-public class cracker
+public class Cracker
 {
     private Thread t;
     private String threadName;
-    RunnableHash (String digest){
-        threadName = hash;
+    private String hash;
+    void RunnableHash (String digest){
+        threadName = digest;
         System.out.print("Creating "+threadName);
     }
     public void run() {
@@ -43,7 +56,7 @@ public class cracker
         System.out.println("Starting " +  threadName );
         if (t == null)
         {
-            t = new Thread (this, threadName);
+            t = new Thread (threadName);
             t.start ();
         }
     }
@@ -93,8 +106,7 @@ public class cracker
         return sb.toString();
     }
 
-    public static void main (String[] args) throws FileNotFoundException,
-            NoSuchAlgorithmException {
+    public static void main (String[] args) throws FileNotFoundException, NoSuchAlgorithmException {
         if (args.length != 2) {
             err.println("Usage: java edu.sjsu.crypto.Cracker <common passwords> <hashed passwords>");
         }
