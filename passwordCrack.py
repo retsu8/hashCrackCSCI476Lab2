@@ -1,24 +1,19 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import sys, re, hashlib, os, getopt, datetime, multiprocessing, thread
+from collections import Counter
+
 # Check hash length
-
-def chklength(crackedMD5):
-    for hashes in crackedMD5:
-        if len(hashes.strip()) != 32:
-            sys.exit(1)
-
-def md5Cracker(crackedMD5, dictionary, passwords):
+def md5Cracker(crackedPassword, dictionary):
     with open(dictionary, 'r') as wordlist:
+        start = datetime.datetime.now()
         for word in wordlist:
-            print "Checking: ", word.strip()
-            for hash_2_crack in crackedMD5:
-                if hashlib.md5(word.strip()).hexdigest() == hash_2_crack:
-                    passwords.append(word)
-                    break
-                elif len(passwords) >= len(crackedMD5):
-                    wordlist.close()
-                    return passwords
+            #print "Checking: ", word.strip()
+            if hashlib.md5(word.strip()).hexdigest() in crackedPassword:
+                finish = datetime.datetime.now()
+                time = finish - start
+                crackedPassword[hashlib.md5(word.strip()).hexdigest()] = word.strip(), time.total_seconds()
+    return crackedPassword
     wordlist.close()
     return None
 
@@ -31,22 +26,16 @@ def dict_attack(md5table, dictionary):
         print("Check your wordlist path.")
         sys.exit(-1)
     print "Grabbing md5 hashes"
-    crackedMD5 = []
-    passwords = []
-    i = 0
+    crackedPassword = dict()
     with open(md5table, 'r') as hashlist:
-        for hashes in hashlist:
-            crackedMD5.append(hashes)
+        for line in hashlist:
+            line = line.strip()
+            crackedPassword[line] = None
     hashlist.close()
-    chklength(crackedMD5)
-    start = datetime.datetime.now()
     print "Cracking the md5 hashes"
-    passwords = md5Cracker(crackedMD5, dictionary, passwords)
-    finish = datetime.datetime.now()
-    time = finish - start
-    for h, p, t in zip(crackedMD5, passwords, time):
-        print 'Hash: {0} Password: {1} Time: {2}.'.format(h, p, t)
-    print "Finished"
+    crackedPassword = md5Cracker(crackedPassword, dictionary)
+    for key, value in crackedPassword.iteritems():
+        print "The MD5 Hash: %s and the Password/Time is %s" % (key, value)
 
 def main(argv):
     md5table = ""
