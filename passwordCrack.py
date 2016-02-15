@@ -13,9 +13,11 @@ def md5Cracker(crackedPassword, dictionary):
                 finish = datetime.datetime.now()
                 time = finish - start
                 crackedPassword[hashlib.md5(word.strip()).hexdigest()] = word.strip(), time.total_seconds()
-    return crackedPassword
+                if None not in crackedPassword.values():
+                    wordlist.close()
+                    return crackedPassword
     wordlist.close()
-    return None
+    return crackedPassword
 
 def dict_attack(md5table, dictionary):
     threadcount = multiprocessing.cpu_count() -1
